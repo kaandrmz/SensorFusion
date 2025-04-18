@@ -13,47 +13,47 @@ import cv2
 
 from scripts.losses import fusion_prompt_loss
 
-low_light_prompt_path = "./SensorFusion/dataset/EMS_dataset/vis_Low_Light/train/text.txt"
+low_light_prompt_path = "SensorFusion/dataset/EMS_dataset/vis_Low_Light/train/text.txt"
 assert os.path.exists(low_light_prompt_path), "text prompt root: {} does not exist.".format(low_light_prompt_path)
 with open(low_light_prompt_path, 'r', encoding='utf-8') as file:
     low_light_lines = file.readlines()
 
-over_exposure_prompt_path = "./SensorFusion/dataset/EMS_dataset/vis_Exposure/train/text.txt"
+over_exposure_prompt_path = "SensorFusion/dataset/EMS_dataset/vis_Exposure/train/text.txt"
 assert os.path.exists(over_exposure_prompt_path), "text prompt root: {} does not exist.".format(over_exposure_prompt_path)
 with open(over_exposure_prompt_path, 'r', encoding='utf-8') as file:
     over_exposure_lines = file.readlines()
 
-ir_low_contrast_prompt_path = "./SensorFusion/dataset/EMS_dataset/IR_Low_Contrast/train/text.txt"
+ir_low_contrast_prompt_path = "SensorFusion/dataset/EMS_dataset/IR_Low_contrast/train/text.txt"
 assert os.path.exists(ir_low_contrast_prompt_path), "text prompt root: {} does not exist.".format(ir_low_contrast_prompt_path)
 with open(ir_low_contrast_prompt_path, 'r', encoding='utf-8') as file:
     ir_low_contrast_lines = file.readlines()
 
-ir_noise_prompt_path = "./SensorFusion/dataset/EMS_dataset/IR_Random_noise/train/text.txt"
+ir_noise_prompt_path = "SensorFusion/dataset/EMS_dataset/IR_Random_noise/train/text.txt"
 assert os.path.exists(ir_noise_prompt_path), "text prompt root: {} does not exist.".format(ir_noise_prompt_path)
 with open(ir_noise_prompt_path, 'r', encoding='utf-8') as file:
     ir_noise_lines = file.readlines()
 
-ir_stripe_noise_prompt_path = "./SensorFusion/dataset/EMS_dataset/IR_Stripe_noise/train/text.txt"
+ir_stripe_noise_prompt_path = "SensorFusion/dataset/EMS_dataset/IR_Stripe_noise/train/text.txt"
 assert os.path.exists(ir_stripe_noise_prompt_path), "text prompt root: {} does not exist.".format(ir_stripe_noise_prompt_path)
 with open(ir_stripe_noise_prompt_path, 'r', encoding='utf-8') as file:
     ir_stripe_noise_lines = file.readlines()
 
-vis_blur_prompt_path = "./SensorFusion/dataset/EMS_dataset/vis_Blur/train/text.txt"
+vis_blur_prompt_path = "SensorFusion/dataset/EMS_dataset/vis_Blur/train/text.txt"
 assert os.path.exists(vis_blur_prompt_path), "text prompt root: {} does not exist.".format(vis_blur_prompt_path)
 with open(vis_blur_prompt_path, 'r', encoding='utf-8') as file:
     vis_blur_lines = file.readlines()
 
-vis_haze_prompt_path = "./SensorFusion/dataset/EMS_dataset/vis_Haze/train/text.txt"
+vis_haze_prompt_path = "SensorFusion/dataset/EMS_dataset/vis_Haze/train/text.txt"
 assert os.path.exists(vis_haze_prompt_path), "text prompt root: {} does not exist.".format(vis_haze_prompt_path)
 with open(vis_haze_prompt_path, 'r', encoding='utf-8') as file:
     vis_haze_lines = file.readlines()
 
-vis_rain_prompt_path = "./SensorFusion/dataset/EMS_dataset/vis_Rain/train/text.txt"
+vis_rain_prompt_path = "SensorFusion/dataset/EMS_dataset/vis_Rain/train/text.txt"
 assert os.path.exists(vis_rain_prompt_path), "text prompt root: {} does not exist.".format(vis_rain_prompt_path)
 with open(vis_rain_prompt_path, 'r', encoding='utf-8') as file:
     vis_rain_lines = file.readlines()
 
-vis_random_noise_prompt_path = "./SensorFusion/dataset/EMS_dataset/vis_Random_noise/train/text.txt"
+vis_random_noise_prompt_path = "SensorFusion/dataset/EMS_dataset/vis_Random_noise/train/text.txt"
 assert os.path.exists(vis_random_noise_prompt_path), "text prompt root: {} does not exist.".format(vis_random_noise_prompt_path)
 with open(vis_random_noise_prompt_path, 'r', encoding='utf-8') as file:
     vis_random_noise_lines = file.readlines()
