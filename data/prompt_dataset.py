@@ -13,117 +13,117 @@ class PromptDataSet(Dataset):
         self.phase = phase
         if phase == "train":
             self.paths = {
-                # 'low_light_A': train_low_light_path_list[0],
-                # 'low_light_B': train_low_light_path_list[1],
+                'low_light_A': train_low_light_path_list[0],
+                'low_light_B': train_low_light_path_list[1],
 
                 'over_exposure_A': train_over_exposure_path_list[0],
                 'over_exposure_B': train_over_exposure_path_list[1],
 
-                # 'ir_low_contrast_A': train_ir_low_contrast_path_list[0],
-                # 'ir_low_contrast_B': train_ir_low_contrast_path_list[1],
+                'ir_low_contrast_A': train_ir_low_contrast_path_list[0],
+                'ir_low_contrast_B': train_ir_low_contrast_path_list[1],
 
-                # 'ir_noise_A': train_ir_noise_path_list[0],
-                # 'ir_noise_B': train_ir_noise_path_list[1],
+                'ir_noise_A': train_ir_noise_path_list[0],
+                'ir_noise_B': train_ir_noise_path_list[1],
 
-                # 'ir_stripe_noise_A': train_ir_stripe_noise_path_list[0],
-                # 'ir_stripe_noise_B': train_ir_stripe_noise_path_list[1],
+                'ir_stripe_noise_A': train_ir_stripe_noise_path_list[0],
+                'ir_stripe_noise_B': train_ir_stripe_noise_path_list[1],
 
-                # 'vis_blur_A': train_vis_blur_path_list[0],
-                # 'vis_blur_B': train_vis_blur_path_list[1],
+                'vis_blur_A': train_vis_blur_path_list[0],
+                'vis_blur_B': train_vis_blur_path_list[1],
 
-                # 'vis_haze_A': train_vis_haze_path_list[0],
-                # 'vis_haze_B': train_vis_haze_path_list[1],
+                'vis_haze_A': train_vis_haze_path_list[0],
+                'vis_haze_B': train_vis_haze_path_list[1],
 
-                # 'vis_rain_A': train_vis_rain_path_list[0],
-                # 'vis_rain_B': train_vis_rain_path_list[1],
+                'vis_rain_A': train_vis_rain_path_list[0],
+                'vis_rain_B': train_vis_rain_path_list[1],
 
-                # 'vis_random_noise_A': train_vis_random_noise_path_list[0],
-                # 'vis_random_noise_B': train_vis_random_noise_path_list[1],
+                'vis_random_noise_A': train_vis_random_noise_path_list[0],
+                'vis_random_noise_B': train_vis_random_noise_path_list[1],
             }
             self.paths_gt = {
-                # 'low_light_A_gt': train_low_light_path_list[2],
-                # 'low_light_B_gt': train_low_light_path_list[3],
+                'low_light_A_gt': train_low_light_path_list[2],
+                'low_light_B_gt': train_low_light_path_list[3],
 
                 'over_exposure_A_gt': train_over_exposure_path_list[2],
                 'over_exposure_B_gt': train_over_exposure_path_list[3],
 
-                # 'ir_low_contrast_A_gt': train_ir_low_contrast_path_list[2],
-                # 'ir_low_contrast_B_gt': train_ir_low_contrast_path_list[3],
+                'ir_low_contrast_A_gt': train_ir_low_contrast_path_list[2],
+                'ir_low_contrast_B_gt': train_ir_low_contrast_path_list[3],
 
-                # 'ir_noise_A_gt': train_ir_noise_path_list[2],
-                # 'ir_noise_B_gt': train_ir_noise_path_list[3],
+                'ir_noise_A_gt': train_ir_noise_path_list[2],
+                'ir_noise_B_gt': train_ir_noise_path_list[3],
 
-                # 'ir_stripe_noise_A_gt': train_ir_stripe_noise_path_list[2],
-                # 'ir_stripe_noise_B_gt': train_ir_stripe_noise_path_list[3],
+                'ir_stripe_noise_A_gt': train_ir_stripe_noise_path_list[2],
+                'ir_stripe_noise_B_gt': train_ir_stripe_noise_path_list[3],
 
-                # 'vis_blur_A_gt': train_vis_blur_path_list[2],
-                # 'vis_blur_B_gt': train_vis_blur_path_list[3],
+                'vis_blur_A_gt': train_vis_blur_path_list[2],
+                'vis_blur_B_gt': train_vis_blur_path_list[3],
 
-                # 'vis_haze_A_gt': train_vis_haze_path_list[2],
-                # 'vis_haze_B_gt': train_vis_haze_path_list[3],
+                'vis_haze_A_gt': train_vis_haze_path_list[2],
+                'vis_haze_B_gt': train_vis_haze_path_list[3],
 
-                # 'vis_rain_A_gt': train_vis_rain_path_list[2],
-                # 'vis_rain_B_gt': train_vis_rain_path_list[3],
+                'vis_rain_A_gt': train_vis_rain_path_list[2],
+                'vis_rain_B_gt': train_vis_rain_path_list[3],
 
-                # 'vis_random_noise_A_gt': train_vis_random_noise_path_list[2],
-                # 'vis_random_noise_B_gt': train_vis_random_noise_path_list[3],
+                'vis_random_noise_A_gt': train_vis_random_noise_path_list[2],
+                'vis_random_noise_B_gt': train_vis_random_noise_path_list[3],
             }
         else:
             self.paths = {
-                # 'low_light_A': val_low_light_path_list[0],
-                # 'low_light_B': val_low_light_path_list[1],
+                'low_light_A': val_low_light_path_list[0],
+                'low_light_B': val_low_light_path_list[1],
 
                 'over_exposure_A': val_over_exposure_path_list[0],
                 'over_exposure_B': val_over_exposure_path_list[1],
 
-                # 'ir_low_contrast_A': val_ir_low_contrast_path_list[0],
-                # 'ir_low_contrast_B': val_ir_low_contrast_path_list[1],
+                'ir_low_contrast_A': val_ir_low_contrast_path_list[0],
+                'ir_low_contrast_B': val_ir_low_contrast_path_list[1],
 
-                # 'ir_noise_A': val_ir_noise_path_list[0],
-                # 'ir_noise_B': val_ir_noise_path_list[1],
+                'ir_noise_A': val_ir_noise_path_list[0],
+                'ir_noise_B': val_ir_noise_path_list[1],
 
-                # 'ir_stripe_noise_A': val_ir_stripe_noise_path_list[0],
-                # 'ir_stripe_noise_B': val_ir_stripe_noise_path_list[1],
+                'ir_stripe_noise_A': val_ir_stripe_noise_path_list[0],
+                'ir_stripe_noise_B': val_ir_stripe_noise_path_list[1],
 
-                # 'vis_blur_A': val_vis_blur_path_list[0],
-                # 'vis_blur_B': val_vis_blur_path_list[1],
+                'vis_blur_A': val_vis_blur_path_list[0],
+                'vis_blur_B': val_vis_blur_path_list[1],
 
-                # 'vis_haze_A': val_vis_haze_path_list[0],
-                # 'vis_haze_B': val_vis_haze_path_list[1],
+                'vis_haze_A': val_vis_haze_path_list[0],
+                'vis_haze_B': val_vis_haze_path_list[1],
 
-                # 'vis_rain_A': val_vis_rain_path_list[0],
-                # 'vis_rain_B': val_vis_rain_path_list[1],
+                'vis_rain_A': val_vis_rain_path_list[0],
+                'vis_rain_B': val_vis_rain_path_list[1],
 
-                # 'vis_random_noise_A': val_vis_random_noise_path_list[0],
-                # 'vis_random_noise_B': val_vis_random_noise_path_list[1],
+                'vis_random_noise_A': val_vis_random_noise_path_list[0],
+                'vis_random_noise_B': val_vis_random_noise_path_list[1],
             }
             self.paths_gt = {
-                # 'low_light_A_gt': val_low_light_path_list[0],
-                # 'low_light_B_gt': val_low_light_path_list[1],
+                'low_light_A_gt': val_low_light_path_list[0],
+                'low_light_B_gt': val_low_light_path_list[1],
 
                 'over_exposure_A_gt': val_over_exposure_path_list[0],
                 'over_exposure_B_gt': val_over_exposure_path_list[1],
 
-                # 'ir_low_contrast_A_gt': val_ir_low_contrast_path_list[0],
-                # 'ir_low_contrast_B_gt': val_ir_low_contrast_path_list[1],
+                'ir_low_contrast_A_gt': val_ir_low_contrast_path_list[0],
+                'ir_low_contrast_B_gt': val_ir_low_contrast_path_list[1],
 
-                # 'ir_noise_A_gt': val_ir_noise_path_list[0],
-                # 'ir_noise_B_gt': val_ir_noise_path_list[1],
+                'ir_noise_A_gt': val_ir_noise_path_list[0],
+                'ir_noise_B_gt': val_ir_noise_path_list[1],
 
-                # 'ir_stripe_noise_A_gt': val_ir_stripe_noise_path_list[0],
-                # 'ir_stripe_noise_B_gt': val_ir_stripe_noise_path_list[1],
+                'ir_stripe_noise_A_gt': val_ir_stripe_noise_path_list[0],
+                'ir_stripe_noise_B_gt': val_ir_stripe_noise_path_list[1],
 
-                # 'vis_blur_A_gt': val_vis_blur_path_list[0],
-                # 'vis_blur_B_gt': val_vis_blur_path_list[1],
+                'vis_blur_A_gt': val_vis_blur_path_list[0],
+                'vis_blur_B_gt': val_vis_blur_path_list[1],
 
-                # 'vis_haze_A_gt': val_vis_haze_path_list[0],
-                # 'vis_haze_B_gt': val_vis_haze_path_list[1],
+                'vis_haze_A_gt': val_vis_haze_path_list[0],
+                'vis_haze_B_gt': val_vis_haze_path_list[1],
 
-                # 'vis_rain_A_gt': val_vis_rain_path_list[0],
-                # 'vis_rain_B_gt': val_vis_rain_path_list[1],
+                'vis_rain_A_gt': val_vis_rain_path_list[0],
+                'vis_rain_B_gt': val_vis_rain_path_list[1],
 
-                # 'vis_random_noise_A_gt': val_vis_random_noise_path_list[0],
-                # 'vis_random_noise_B_gt': val_vis_random_noise_path_list[1],
+                'vis_random_noise_A_gt': val_vis_random_noise_path_list[0],
+                'vis_random_noise_B_gt': val_vis_random_noise_path_list[1],
             }
         self.transform = transform
 

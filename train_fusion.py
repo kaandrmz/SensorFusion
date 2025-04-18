@@ -307,7 +307,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--epochs', type=int, default=60)
+    parser.add_argument('--epochs', type=int, default=120)
 
     # set the appropriate batch-size value for your device
     parser.add_argument('--batch-size', type=int, default=8)
