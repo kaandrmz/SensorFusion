@@ -33,7 +33,7 @@ def main(args):
         os.makedirs("./experiments")
 
     # file_name = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-    filefold_path = "experiments"
+    filefold_path = "experiments/aaaaaaaa"
     os.makedirs(filefold_path, exist_ok=True)
     file_img_path = os.path.join(filefold_path, "img")
     os.makedirs(file_img_path, exist_ok=True)
@@ -145,9 +145,6 @@ def main(args):
         "train": T.Compose([T.RandomCrop(96),
                             T.RandomHorizontalFlip(0.5),
                             T.RandomVerticalFlip(0.5),
-                            T.RandomAffine(degrees=10, translate=(0.1, 0.1), scale=(0.9, 1.1)),
-                            T.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2),
-                            T.RandomGrayscale(p=0.05),
                             T.ToTensor()]),
 
         "val": T.Compose([T.Resize_16(),

@@ -639,30 +639,18 @@ class Encoder_A(nn.Module):
         inp_enc_level1_A = self.patch_embed(inp_img_A)
         out_enc_level1_A = self.encoder_level1(inp_enc_level1_A)
         
-        # Apply text guidance after level 1
-        if text_features is not None:
-            out_enc_level1_A = self.text_guidance1(out_enc_level1_A, text_features)
 
         inp_enc_level2_A = self.down1_2(out_enc_level1_A)
         out_enc_level2_A = self.encoder_level2(inp_enc_level2_A)
         
-        # Apply text guidance after level 2
-        if text_features is not None:
-            out_enc_level2_A = self.text_guidance2(out_enc_level2_A, text_features)
 
         inp_enc_level3_A = self.down2_3(out_enc_level2_A)
         out_enc_level3_A = self.encoder_level3(inp_enc_level3_A)
         
-        # Apply text guidance after level 3
-        if text_features is not None:
-            out_enc_level3_A = self.text_guidance3(out_enc_level3_A, text_features)
 
         inp_enc_level4_A = self.down3_4(out_enc_level3_A)
         out_enc_level4_A = self.encoder_level4(inp_enc_level4_A)
         
-        # Apply text guidance after level 4
-        if text_features is not None:
-            out_enc_level4_A = self.text_guidance4(out_enc_level4_A, text_features)
 
         return out_enc_level4_A, out_enc_level3_A, out_enc_level2_A, out_enc_level1_A
 
@@ -698,30 +686,18 @@ class Encoder_B(nn.Module):
         inp_enc_level1_B = self.patch_embed(inp_img_B)
         out_enc_level1_B = self.encoder_level1(inp_enc_level1_B)
         
-        # Apply text guidance after level 1
-        if text_features is not None:
-            out_enc_level1_B = self.text_guidance1(out_enc_level1_B, text_features)
 
         inp_enc_level2_B = self.down1_2(out_enc_level1_B)
         out_enc_level2_B = self.encoder_level2(inp_enc_level2_B)
         
-        # Apply text guidance after level 2
-        if text_features is not None:
-            out_enc_level2_B = self.text_guidance2(out_enc_level2_B, text_features)
 
         inp_enc_level3_B = self.down2_3(out_enc_level2_B)
         out_enc_level3_B = self.encoder_level3(inp_enc_level3_B)
         
-        # Apply text guidance after level 3
-        if text_features is not None:
-            out_enc_level3_B = self.text_guidance3(out_enc_level3_B, text_features)
 
         inp_enc_level4_B = self.down3_4(out_enc_level3_B)
         out_enc_level4_B = self.encoder_level4(inp_enc_level4_B)
         
-        # Apply text guidance after level 4
-        if text_features is not None:
-            out_enc_level4_B = self.text_guidance4(out_enc_level4_B, text_features)
 
         return out_enc_level4_B, out_enc_level3_B, out_enc_level2_B, out_enc_level1_B
 
