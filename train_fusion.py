@@ -32,8 +32,8 @@ def main(args):
     if os.path.exists("./experiments") is False:
         os.makedirs("./experiments")
 
-    # file_name = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-    filefold_path = "experiments/aaaaaaaa"
+    file_name = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    filefold_path = "experiments." + file_name
     os.makedirs(filefold_path, exist_ok=True)
     file_img_path = os.path.join(filefold_path, "img")
     os.makedirs(file_img_path, exist_ok=True)
@@ -310,6 +310,7 @@ if __name__ == '__main__':
     parser.add_argument('--batch-size', type=int, default=8)
     parser.add_argument('--lr', type=float, default=0.0001)
 
+    # EMS
     parser.add_argument('--low_light_path', type=str, default="SensorFusion/dataset/EMS_dataset/vis_Low_Light")
     parser.add_argument('--over_exposure_path', type=str, default="SensorFusion/dataset/EMS_dataset/vis_Exposure")
     parser.add_argument('--ir_low_contrast_path', type=str, default="SensorFusion/dataset/EMS_dataset/IR_Low_contrast")

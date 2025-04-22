@@ -67,10 +67,6 @@ def main(args):
         print("Using MFNET dataset metrics: SD, EN, MUSIQ")
         metric_names = ['SD', 'EN', 'MUSIQ']
         num_metrics = len(metric_names)
-    elif dataset_type == "RoadScene":
-        print("Using RoadScene dataset metrics: SF, NIQE, BRISQUE")
-        metric_names = ['SF', 'NIQE', 'BRISQUE']
-        num_metrics = len(metric_names)
     elif dataset_type == "all":
         print("Using all dataset metrics: EN, SD, SF, MI, SCD, VIFF, Qabf, SSIM, NIQE, MUSIQ, BRISQUE, CLIP-IQA")
         metric_names = ['EN', 'SD', 'SF', 'MI', 'SCD', 'VIFF', 'Qabf', 'SSIM', 'NIQE', 'MUSIQ', 'BRISQUE', 'CLIP-IQA']
@@ -80,7 +76,7 @@ def main(args):
         metric_names = ['NIQE', 'MUSIQ', 'BRISQUE', 'CLIP-IQA']
         num_metrics = len(metric_names)
     else:
-        raise ValueError(f"Invalid dataset type: {dataset_type}. Must be 'EMS' or 'MSRS' or 'LLVIP' or 'MFNET' or 'RoadScene' or 'all'")
+        raise ValueError(f"Invalid dataset type: {dataset_type}. Must be 'EMS' or 'MSRS' or 'LLVIP' or 'MFNET' or 'all' or 'rest'")
 
     metric_result = np.zeros((num_metrics))
     num_images = len(visible_path)
@@ -150,12 +146,6 @@ def main(args):
                 Evaluator.EN(fused_gray),
                 Evaluator.MUSIQ(fused_img_Y)
             ])
-        elif dataset_type == "RoadScene":
-            metrics = np.array([
-                Evaluator.SF(fused_gray),
-                Evaluator.NIQE(fused_gray),
-                Evaluator.BRISQUE(fused_img_Y)
-            ])
         elif dataset_type == "all":
             metrics = np.array([
                 Evaluator.EN(fused_gray),
@@ -194,8 +184,6 @@ def main(args):
         print("EN\tNIQE\tMUSIQ")
     elif dataset_type == "MFNET":
         print("SD\tEN\tMUSIQ")
-    elif dataset_type == "RoadScene":
-        print("SF\tNIQE\tBRISQUE")
     elif dataset_type == "all":
         print("EN\tSD\tSF\tMI\tSCD\tVIFF\tQabf\tSSIM\tNIQE\tMUSIQ\tBRISQUE\tCLIP-IQA")
     elif dataset_type == "rest":
@@ -235,7 +223,7 @@ if __name__ == '__main__':
     parser.add_argument('--weights_path', type=str, required=True, help='initial weights path')
     parser.add_argument('--save_path', type=str, default='./results', help='output save image path')
     parser.add_argument('--input_text', type=str, required=True, help='text control input')
-    parser.add_argument('--dataset_type', type=str, default='EMS', choices=['EMS', 'MSRS', 'LLVIP', 'MFNET', 'RoadScene', 'all', 'rest'], help='dataset type to determine which metrics to use')
+    parser.add_argument('--dataset_type', type=str, default='EMS', choices=['EMS', 'MSRS', 'LLVIP', 'MFNET', 'all', 'rest'], help='dataset type to determine which metrics to use')
 
     parser.add_argument('--device', default='cuda', help='device (i.e. cuda or cpu)')
     parser.add_argument('--gpu_id', default='5', help='device id (i.e. 0, 1, 2 or 3)')

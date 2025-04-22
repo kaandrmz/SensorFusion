@@ -10,9 +10,7 @@ def check_weights_compatibility(model, checkpoint_path):
     # Get model state dict - it's nested under 'model' key
     checkpoint_state_dict = checkpoint['model'] if 'model' in checkpoint else checkpoint
     
-    # Get current model state dict, excluding CLIP weights
-    model_state_dict = {k: v for k, v in model.state_dict().items() 
-                       if not k.startswith('model_clip.')}
+    model_state_dict = {k: v for k, v in model.state_dict().items()}
     
     # Compare shapes
     mismatched_layers = []

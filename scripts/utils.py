@@ -178,84 +178,12 @@ def train_one_epoch(model, model_clip, optimizer, lr_scheduler, data_loader, dev
     if torch.cuda.is_available():
         loss_function_prompt = loss_function_prompt.to(device)
 
-    ##################################################################################
-    # # 4 times score maps
-    # def compute_prompt_loss(image_A, image_B, score_map1, score_map2, score_map3, score_map4, task, text_features=None, temperature=0.07):
-    #     """
-    #     Compute prompt loss by treating score_map as a low-res fusion result
-    #     Args:
-    #         image_A: tensor of shape [B, C, H, W] (visible image)
-    #         image_B: tensor of shape [B, C, H, W] (infrared image)
-    #         score_map: tensor of shape [B, C, H, W] (score map)
-    #         task: list of task types
-    #         temperature: temperature coefficient for scaling
-    #     Returns:
-    #         loss: scalar tensor
-    #     """
-    #     print("Shapes before processing:")
-    #     print(f"image_A: {image_A.shape}")
-    #     print(f"image_B: {image_B.shape}")
-    #     print(f"score_map1: {score_map1.shape}")
-    #     print(f"text_features: {text_features.shape if text_features is not None else None}")
-    #     losses=[]
-    #     weights = [0.4, 0.3, 0.2, 0.1]
-    #     window_size = 48  # Starting window size
-    #     min_window_size = 3  # Prevent window becoming too small
-        
-    #     # Debug NaN/Inf values
-    #     for i, score_map in enumerate([score_map1, score_map2, score_map3, score_map4]):
-    #         if torch.isnan(score_map).any() or torch.isinf(score_map).any():
-    #             print(f"WARNING: score_map{i+1} contains NaN or Inf values")
-    #             score_map = torch.nan_to_num(score_map, nan=0.0, posinf=1.0, neginf=0.0)
-        
-    #     # Scale and normalize score_map
-    #     for score_map, weight in zip([score_map1, score_map2, score_map3, score_map4], weights):
-    #         score_map = score_map / temperature
-    #         # score_map = torch.sigmoid(score_map)
-            
-    #         # Get score_map dimensions
-    #         h, w = score_map.shape[2:]
-            
-    #         # Resize input images to match score_map resolution
-    #         image_A_small = F.interpolate(image_A, size=(h, w), mode='bilinear', align_corners=False)
-    #         image_B_small = F.interpolate(image_B, size=(h, w), mode='bilinear', align_corners=False)
-            
-    #         # Create a new loss function with the current window size
-    #         loss_function_with_window = fusion_prompt_loss(window_size=window_size)
-    #         if torch.cuda.is_available():
-    #             loss_function_with_window = loss_function_with_window.to(device)
-            
-    #         # Calculate all fusion losses using the score_map as the "fused" image
-    #         # loss, ssim_loss, max_loss, color_loss, grad_loss = loss_function_with_window(
-    #         #     image_A_small, 
-    #         #     image_B_small, 
-    #         #     score_map,
-    #         #     task
-    #         # )
-    #         loss, ssim_loss, max_loss, color_loss, grad_loss = loss_function_with_window(
-    #             image_A_small, 
-    #             image_B_small, 
-    #             score_map,
-    #             task,
-    #             text_features
-    #         )
-    #         losses.append(weight*loss)
-            
-    #         # Halve the window size for next iteration
-    #         window_size = max(window_size // 2, min_window_size)  # Prevent too small windows
-        
-    #     return sum(losses)
-    ##################################################################################
-
 
     accu_total_loss = torch.zeros(1).to(device)
     accu_ssim_loss = torch.zeros(1).to(device)
     accu_max_loss = torch.zeros(1).to(device)
     accu_color_loss = torch.zeros(1).to(device)
     accu_text_loss = torch.zeros(1).to(device)
-
-    # accu_original_loss = torch.zeros(1).to(device)
-    # accu_ptm_loss = torch.zeros(1).to(device)
 
     optimizer.zero_grad()
 
@@ -265,7 +193,6 @@ def train_one_epoch(model, model_clip, optimizer, lr_scheduler, data_loader, dev
         text_line = []
 
         for index in range(len(task)):
-        # default type degradation in vis image
             if task[index] == "low_light":
                 text_line.append(get_low_light_prompt())
             elif task[index] == "over_exposure":
@@ -297,35 +224,22 @@ def train_one_epoch(model, model_clip, optimizer, lr_scheduler, data_loader, dev
         
         # I_fused = model(I_A, I_B, text) # For original
         I_fused, text_features = model(I_A, I_B, text)
-        # I_fused, text_features, score_map1, score_map2, score_map3, score_map4 = model(I_A, I_B, text)
-
-        # loss_original, loss_ssim, loss_max, loss_color, loss_text = loss_function_prompt(I_A_gt, I_B_gt, I_fused, task)
-        # loss_original, loss_ssim, loss_max, loss_color, loss_text = loss_function_prompt(I_A_gt, I_B_gt, I_fused, task, text_features)
-        # loss_ptm = compute_prompt_loss(I_A_gt, I_B_gt, score_map1, score_map2, score_map3, score_map4, task, text_features)
-        # loss = loss_ptm + loss_original
 
         # loss, loss_ssim, loss_max, loss_color, loss_text = loss_function_prompt(I_A_gt, I_B_gt, I_fused, task) # original	
         loss, loss_ssim, loss_max, loss_color, loss_text = loss_function_prompt(I_A_gt, I_B_gt, I_fused, task, text_features) 
         loss.backward()
 
         accu_total_loss += loss.detach()
-        # accu_original_loss += loss_original.detach() # original loss, added for denseclip 
         accu_ssim_loss += loss_ssim.detach()
         accu_max_loss += loss_max.detach()
         accu_color_loss += loss_color.detach()
         accu_text_loss += loss_text.detach()
-        # accu_ptm_loss += loss_ptm.detach()
 
         lr = optimizer.param_groups[0]["lr"]
 
-        #original
         data_loader.desc = "[train epoch {}] loss: {:.3f}  ssim loss: {:.3f}  max loss: {:.3f}  color loss: {:.3f}  text loss: {:.3f}  lr: {:.6f}".format(epoch, accu_total_loss.item() / (step + 1),
             accu_ssim_loss.item() / (step + 1), accu_max_loss.item() / (step + 1), accu_color_loss.item() / (step + 1), accu_text_loss.item() / (step + 1), lr)
-        
-        # # add ptm loss
-        # data_loader.desc = "[train epoch {}] loss: {:.3f} original loss: {:.3f}  ssim loss: {:.3f}  max loss: {:.3f}  color loss: {:.3f}  text loss: {:.3f} ptm loss: {:.3f} lr: {:.6f}".format(epoch, accu_total_loss.item() / (step + 1),
-        #     accu_original_loss.item() / (step + 1), accu_ssim_loss.item() / (step + 1), accu_max_loss.item() / (step + 1), accu_color_loss.item() / (step + 1), accu_text_loss.item() / (step + 1), accu_ptm_loss.item() / (step + 1), lr)
-        
+       
         if not torch.isfinite(loss):
             print('WARNING: non-finite loss, ending training ', loss)
             sys.exit(1)
@@ -335,7 +249,6 @@ def train_one_epoch(model, model_clip, optimizer, lr_scheduler, data_loader, dev
         optimizer.zero_grad()
 
     return accu_total_loss.item() / (step + 1), accu_ssim_loss.item() / (step + 1), accu_max_loss.item() / (step + 1), accu_color_loss.item() / (step + 1), accu_text_loss.item() / (step + 1), lr
-    # return accu_total_loss.item() / (step + 1), accu_original_loss.item() / (step + 1), accu_ssim_loss.item() / (step + 1), accu_max_loss.item() / (step + 1), accu_color_loss.item() / (step + 1), accu_text_loss.item() / (step + 1), accu_ptm_loss.item() / (step + 1), lr
 
 
 @torch.no_grad()
@@ -349,9 +262,6 @@ def evaluate(model, data_loader, device, epoch, lr, filefold_path):
     accu_color_loss = torch.zeros(1).to(device)
     accu_text_loss = torch.zeros(1).to(device)
 
-    # accu_original_loss = torch.zeros(1).to(device)
-    # accu_ptm_loss = torch.zeros(1).to(device)
-
     save_epoch = 1
     save_length = 60
     cnt = 0
@@ -364,76 +274,6 @@ def evaluate(model, data_loader, device, epoch, lr, filefold_path):
         evalfold_path = os.path.join(filefold_path, str(epoch))
         if os.path.exists(evalfold_path) is False:
             os.makedirs(evalfold_path)
-
-    ###########################################################################
-    # # 4 times score maps
-    # def compute_prompt_loss(image_A, image_B, score_map1, score_map2, score_map3, score_map4, task, text_features=None, temperature=0.07):
-    #     """
-    #     Compute prompt loss by treating score_map as a low-res fusion result
-    #     Args:
-    #         image_A: tensor of shape [B, C, H, W] (visible image)
-    #         image_B: tensor of shape [B, C, H, W] (infrared image)
-    #         score_map: tensor of shape [B, C, H, W] (score map)
-    #         task: list of task types
-    #         temperature: temperature coefficient for scaling
-    #     Returns:
-    #         loss: scalar tensor
-    #     """
-    #     print("Shapes before processing:")
-    #     print(f"image_A: {image_A.shape}")
-    #     print(f"image_B: {image_B.shape}")
-    #     print(f"score_map1: {score_map1.shape}")
-    #     print(f"text_features: {text_features.shape if text_features is not None else None}")
-    #     losses=[]
-    #     weights = [0.4, 0.3, 0.2, 0.1]
-    #     window_size = 48  # Starting window size
-    #     min_window_size = 3  # Prevent window becoming too small
-        
-    #     # Debug NaN/Inf values
-    #     for i, score_map in enumerate([score_map1, score_map2, score_map3, score_map4]):
-    #         if torch.isnan(score_map).any() or torch.isinf(score_map).any():
-    #             print(f"WARNING: score_map{i+1} contains NaN or Inf values")
-    #             score_map = torch.nan_to_num(score_map, nan=0.0, posinf=1.0, neginf=0.0)
-        
-    #     # Scale and normalize score_map
-    #     for score_map, weight in zip([score_map1, score_map2, score_map3, score_map4], weights):
-    #         score_map = score_map / temperature
-    #         # score_map = torch.sigmoid(score_map)
-            
-    #         # Get score_map dimensions
-    #         h, w = score_map.shape[2:]
-            
-    #         # Resize input images to match score_map resolution
-    #         image_A_small = F.interpolate(image_A, size=(h, w), mode='bilinear', align_corners=False)
-    #         image_B_small = F.interpolate(image_B, size=(h, w), mode='bilinear', align_corners=False)
-            
-    #         # Create a new loss function with the current window size
-    #         loss_function_with_window = fusion_prompt_loss(window_size=window_size)
-    #         if torch.cuda.is_available():
-    #             loss_function_with_window = loss_function_with_window.to(device)
-            
-    #         # Calculate all fusion losses using the score_map as the "fused" image
-    #         # loss, ssim_loss, max_loss, color_loss, grad_loss = loss_function_with_window(
-    #         #     image_A_small, 
-    #         #     image_B_small, 
-    #         #     score_map,
-    #         #     task
-    #         # )
-    #         loss, ssim_loss, max_loss, color_loss, grad_loss = loss_function_with_window(
-    #             image_A_small, 
-    #             image_B_small, 
-    #             score_map,
-    #             task,
-    #             text_features
-    #         )
-    #         losses.append(weight*loss)
-            
-    #         # Halve the window size for next iteration
-    #         window_size = max(window_size // 2, min_window_size)  # Prevent too small windows
-        
-    #     return sum(losses) * 0.5 # to make it more comparable with original loss
-    ##################################################################################
-
 
     data_loader = tqdm(data_loader, file=sys.stdout)
     for step, data in enumerate(data_loader):
@@ -471,15 +311,12 @@ def evaluate(model, data_loader, device, epoch, lr, filefold_path):
             I_full = I_full.to(device)
 
         # I_fused = model(I_A, I_B, text) # for original
-        I_fused, text_features = model(I_A, I_B, text) # for weight embeddings
-        # I_fused, score_map1, score_map2, score_map3, score_map4 = model(I_A, I_B, text)
-        # I_fused, text_features, score_map1, score_map2, score_map3, score_map4 = model(I_A, I_B, text) # for weight embeddings and denseclip
+        I_fused, text_features = model(I_A, I_B, text)
 
 
 
         if epoch % save_epoch == 0:
             if cnt <= save_length:
-                # fused_img_Y = tensor2numpy(I_fused_rectified)
                 fused_img_Y = tensor2numpy(I_fused)
                 img_full = tensor2numpy(I_full)
                 img_ir = tensor2numpy(I_B_gt)
@@ -488,36 +325,20 @@ def evaluate(model, data_loader, device, epoch, lr, filefold_path):
                     save_pic(img_full, evalfold_path, str(name[0]) + "vis")
                     save_pic(img_ir, evalfold_path, str(name[0]) + "ir")
                 cnt += 1
-        
-        # loss_original, loss_ssim, loss_max, loss_color, loss_text = loss_function_prompt(I_A_gt, I_B_gt, I_fused, task) # denseclip
-        # loss_ptm = compute_prompt_loss(I_A_gt, I_B_gt, score_map1, score_map2, score_map3, score_map4, task)
-
-        # loss_original, loss_ssim, loss_max, loss_color, loss_text = loss_function_prompt(I_A_gt, I_B_gt, I_fused, task, text_features)
-        # loss_ptm = compute_prompt_loss(I_A_gt, I_B_gt, score_map1, score_map2, score_map3, score_map4, task, text_features)
-
-        # loss = loss_ptm + loss_original
 
         # loss, loss_ssim, loss_max, loss_color, loss_text = loss_function_prompt(I_A_gt, I_B_gt, I_fused, task) # original
-        loss, loss_ssim, loss_max, loss_color, loss_text = loss_function_prompt(I_A_gt, I_B_gt, I_fused, task, text_features) # for weight embeddings        
+        loss, loss_ssim, loss_max, loss_color, loss_text = loss_function_prompt(I_A_gt, I_B_gt, I_fused, task, text_features)        
         
         accu_total_loss += loss
 
-        # accu_original_loss += loss_original.detach()
         accu_ssim_loss += loss_ssim.detach()
         accu_max_loss += loss_max.detach()
         accu_color_loss += loss_color.detach()
         accu_text_loss += loss_text
-        # accu_ptm_loss += loss_ptm.detach()
 
-        # original
         data_loader.desc = "[val epoch {}] loss: {:.3f} ssim loss: {:.3f}  max loss: {:.3f}  color loss: {:.3f}  text loss: {:.3f}  lr: {:.6f}".format(epoch, accu_total_loss.item() / (step + 1), accu_ssim_loss.item() / (step + 1), accu_max_loss.item() / (step + 1), accu_color_loss.item() / (step + 1), accu_text_loss.item() / (step + 1), lr)
         
-        # # denseclip
-        # data_loader.desc = "[val epoch {}] loss: {:.3f} original loss: {:.3f}  ssim loss: {:.3f}  max loss: {:.3f}  color loss: {:.3f}  text loss: {:.3f}  ptm loss: {:.3f}  lr: {:.6f}".format(epoch, accu_total_loss.item() / (step + 1),
-        #     accu_original_loss.item() / (step + 1), accu_ssim_loss.item() / (step + 1), accu_max_loss.item() / (step + 1), accu_color_loss.item() / (step + 1), accu_text_loss.item() / (step + 1), accu_ptm_loss.item() / (step + 1), lr)
-
     return accu_total_loss.item() / (step + 1), accu_ssim_loss.item() / (step + 1), accu_max_loss.item() / (step + 1), accu_color_loss.item() / (step + 1), accu_text_loss.item() / (step + 1)
-    # return accu_total_loss.item() / (step + 1), accu_original_loss.item() / (step + 1), accu_ssim_loss.item() / (step + 1), accu_max_loss.item() / (step + 1), accu_color_loss.item() / (step + 1), accu_text_loss.item() / (step + 1), accu_ptm_loss.item() / (step + 1)
 
 def mergy_Y_RGB_to_YCbCr(img1, img2):
     Y_channel = img1.squeeze(0).cpu().numpy()

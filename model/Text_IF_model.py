@@ -11,7 +11,7 @@ class Text_IF(nn.Module):
                  dim=48, num_blocks=[2, 2, 2, 2],
                  heads=[1, 2, 4, 8],
                  ffn_expansion_factor=2,
-                #  num_refinement_blocks=4,
+                 num_refinement_blocks=4,
                  bias=False,
                  LayerNorm_type='WithBias',
                  ):
@@ -32,7 +32,7 @@ class Text_IF(nn.Module):
 
         self.feature_fusion_4 = Fusion_Embed(embed_dim=dim * 2 ** 3)
 
-        # self.prompt_guidance_4 = FeatureWiseAffine(in_channels=512, out_channels=dim * 2 ** 3)
+        # self.prompt_guidance_4 = FeatureWiseAffine(in_channels=512, out_channels=dim * 2 ** 3) # original
         self.prompt_guidance_4 = ContextDecoder(visual_dim=dim * 2**3,transformer_width=512)
         
         self.decoder_level4 = nn.Sequential(*[
@@ -41,7 +41,7 @@ class Text_IF(nn.Module):
 
         self.feature_fusion_3 = Fusion_Embed(embed_dim = dim * 2 ** 2)
 
-        # self.prompt_guidance_3 = FeatureWiseAffine(in_channels=512, out_channels=dim * 2 ** 2)
+        # self.prompt_guidance_3 = FeatureWiseAffine(in_channels=512, out_channels=dim * 2 ** 2) # original
         self.prompt_guidance_3 = ContextDecoder(visual_dim=dim * 2 ** 2, transformer_width=512)
 
 
@@ -51,7 +51,7 @@ class Text_IF(nn.Module):
             TransformerBlock(dim=int(dim * 2 ** 2), num_heads=heads[2], ffn_expansion_factor=ffn_expansion_factor,
                              bias=bias, LayerNorm_type=LayerNorm_type) for i in range(num_blocks[2])])
         self.feature_fusion_2 = Fusion_Embed(embed_dim = dim * 2 ** 1)
-        # self.prompt_guidance_2 = FeatureWiseAffine(in_channels=512, out_channels=dim * 2 ** 1)
+        # self.prompt_guidance_2 = FeatureWiseAffine(in_channels=512, out_channels=dim * 2 ** 1) # original
         self.prompt_guidance_2 = ContextDecoder(visual_dim=dim * 2 ** 1, transformer_width=512)
 
 
@@ -70,82 +70,23 @@ class Text_IF(nn.Module):
         self.decoder_level1 = nn.Sequential(*[ 
             TransformerBlock(dim=int(dim * 2 ** 1), num_heads=heads[0], ffn_expansion_factor=ffn_expansion_factor,
                              bias=bias, LayerNorm_type=LayerNorm_type) for i in range(num_blocks[0])])
-        # self.refinement = nn.Sequential(*[
-        #     TransformerBlock(dim=int(dim * 2 ** 1), num_heads=heads[0], ffn_expansion_factor=ffn_expansion_factor,
-        #                      bias=bias, LayerNorm_type=LayerNorm_type) for i in range(num_refinement_blocks)])
+        self.refinement = nn.Sequential(*[
+            TransformerBlock(dim=int(dim * 2 ** 1), num_heads=heads[0], ffn_expansion_factor=ffn_expansion_factor,
+                             bias=bias, LayerNorm_type=LayerNorm_type) for i in range(num_refinement_blocks)])
         self.refunet = RefUnet(in_ch=96, mid_ch=128) # PG-RRM
         self.output = nn.Conv2d(int(dim * 2 ** 1), out_channels, kernel_size=3, stride=1, padding=1, bias=bias) # C=96 -> C=3
         
-        ####################################################
-        # self.text_chan_reduction1 = nn.Linear(in_features=512, out_features=dim) # denseclip in last layer
-        # self.text_chan_reduction2 = nn.Linear(in_features=512, out_features=dim*2)
-        # self.text_chan_reduction3 = nn.Linear(in_features=512, out_features=dim*2**2)
-        # self.text_chan_reduction4 = nn.Linear(in_features=512, out_features=dim*2**3) # denseclip in first layer
-
-        # self.gamma = nn.Parameter(torch.ones(1) * 1e-4)  # Initialize small like in DenseCLIP
-        # self.score_projection = nn.Conv2d(1, 3, kernel_size=1)  # Project to RGB
-
-        # self.attention_pool1 = AttentionPool2d( # for denseclip in last layer
-        #     spacial_dim=96,  # Your spatial dimension (H=W=96)
-        #     embed_dim=dim,  # Your channel dimension (dim*2)
-        #     num_heads=4,  # small number bc of cuda memory
-        #     output_dim=dim
-        # )
-        
-        # self.attention_pool2 = AttentionPool2d(
-        #     spacial_dim=48,
-        #     embed_dim=dim*2,  # Change from dim to dim*2 to match checkpoint
-        #     num_heads=4,
-        #     output_dim=dim*2
-        # )
-
-        # self.attention_pool3 = AttentionPool2d(
-        #     spacial_dim=24,
-        #     embed_dim=dim*2**2,  # Change from dim to dim*2**2 to match checkpoint
-        #     num_heads=4,
-        #     output_dim=dim*2**2
-        # )
-
-        # self.attention_pool4 = AttentionPool2d( # for denseclip in first layer
-        #     spacial_dim=12,  # Your spatial dimension (H=W=12)
-        #     embed_dim=dim*2**3,  # Your channel dimension (dim*2**3)
-        #     num_heads=4,  # small number bc of cuda memory
-        #     output_dim=dim*2**3
-        # )
-
-        ####################################################
-
-
     def forward(self, inp_img_A, inp_img_B, text):
         b = inp_img_A.shape[0]
         text_features = self.get_text_feature(text.expand(b, -1)).to(inp_img_A.dtype)
-        out_enc_level4_A, out_enc_level3_A, out_enc_level2_A, out_enc_level1_A = self.encoder_A(inp_img_A) # original
+        out_enc_level4_A, out_enc_level3_A, out_enc_level2_A, out_enc_level1_A = self.encoder_A(inp_img_A)
         out_enc_level4_B, out_enc_level3_B, out_enc_level2_B, out_enc_level1_B = self.encoder_B(inp_img_B)
 
         out_enc_level4_A, out_enc_level4_B = self.cross_attention(out_enc_level4_A, out_enc_level4_B)
+
         out_enc_level4 = self.feature_fusion_4(out_enc_level4_A, out_enc_level4_B)
-
         out_enc_level4 = self.attention_spatial(out_enc_level4)
-
-
-        ##########################################################################
-        # # For DenseCLIP loss
-        # global_feat4, feature_map4 = self.attention_pool4(out_enc_level4) 
-        # global_feat4 = global_feat4.unsqueeze(-1).unsqueeze(-1)
-        # out_enc_level4, text_diff4 = self.prompt_guidance_4(out_enc_level4 + global_feat4, text_features) 
-        # text4 = self.text_chan_reduction4(text_features) # [8, 512] -> [8, 384]
-        # B, C, H, W = feature_map4.shape
-        # text4 = text4.unsqueeze(1).expand(-1, 3, -1)  # B,C -> (B, 1, C) -> (B, 3, C) 
-        # text_embeddings4 = text4 + self.gamma * text_diff4
-        # B, K, C = text_embeddings4.shape
-        # feature_map4 = F.normalize(feature_map4, dim=1, p=2)
-        # text_normalized4 = F.normalize(text_embeddings4, dim=2, p=2)
-        # score_map4 = torch.einsum('bchw,bkc->bkhw', feature_map4, text_normalized4)
-        ## print(f"score_map4.shape: {score_map4.shape}") 
-        # out_enc_level4 = torch.cat([out_enc_level4, score_map4], dim=1)
-        ## print(f"out_enc_level4.shape after concat: {out_enc_level4.shape}")
-        ###############################################################################
-
+        
         out_enc_level4 = self.prompt_guidance_4(out_enc_level4, text_features) 
         inp_dec_level4 = out_enc_level4
         out_dec_level4 = self.decoder_level4(inp_dec_level4)
@@ -154,25 +95,6 @@ class Text_IF(nn.Module):
 
         inp_dec_level3 = self.prompt_guidance_3(inp_dec_level3, text_features)
         out_enc_level3 = self.feature_fusion_3(out_enc_level3_A, out_enc_level3_B)
-
-        ##########################################################################
-        # # For DenseCLIP loss for layer 3
-        # global_feat3, feature_map3 = self.attention_pool3(out_enc_level3) # global_feat: [8, dim*2**2] = (b,c)
-        # global_feat3 = global_feat3.unsqueeze(-1).unsqueeze(-1)
-        # inp_dec_level3, text_diff3 = self.prompt_guidance_3(inp_dec_level3 + global_feat3, text_features)
-        # text3 = self.text_chan_reduction3(text_features) # [8, 512] -> [8, dim*2**2]
-
-        # B3, C3, H3, W3 = feature_map3.shape
-        # text3 = text3.unsqueeze(1).expand(-1, 3, -1)  # B,C -> (B, 1, C) -> (B, 3, C)
-        # text_embeddings3 = text3 + self.gamma * text_diff3
-        # B3, K3, C3 = text_embeddings3.shape
-
-        # feature_map3 = F.normalize(feature_map3, dim=1, p=2)
-        # text_normalized3 = F.normalize(text_embeddings3, dim=2, p=2)
-        # score_map3 = torch.einsum('bchw,bkc->bkhw', feature_map3, text_normalized3)
-        # inp_dec_level3 = torch.cat([inp_dec_level3, out_enc_level3, score_map3], dim=1)
-        ##########################################################################
-
         inp_dec_level3 = torch.cat([inp_dec_level3, out_enc_level3], 1)
         inp_dec_level3 = self.reduce_chan_level3(inp_dec_level3)
         out_dec_level3 = self.decoder_level3(inp_dec_level3)
@@ -182,25 +104,6 @@ class Text_IF(nn.Module):
         inp_dec_level2 = self.prompt_guidance_2(inp_dec_level2, text_features)
         out_enc_level2 = self.feature_fusion_2(out_enc_level2_A, out_enc_level2_B)
         inp_dec_level2 = torch.cat([inp_dec_level2, out_enc_level2], 1)
-
-        ##########################################################################
-        # # For DenseCLIP loss for layer 2
-        # global_feat2, feature_map2 = self.attention_pool2(out_enc_level2) # global_feat: [8, dim*2] = (b,c)
-        # global_feat2 = global_feat2.unsqueeze(-1).unsqueeze(-1)
-        # inp_dec_level2, text_diff2 = self.prompt_guidance_2(inp_dec_level2 + global_feat2, text_features)
-        # text2 = self.text_chan_reduction2(text_features) # [8, 512] -> [8, dim*2]
-
-        # B2, C2, H2, W2 = feature_map2.shape
-        # text2 = text2.unsqueeze(1).expand(-1, 3, -1)  # B,C -> (B, 1, C) -> (B, 3, C)
-        # text_embeddings2 = text2 + self.gamma * text_diff2
-        # B2, K2, C2 = text_embeddings2.shape
-
-        # feature_map2 = F.normalize(feature_map2, dim=1, p=2)
-        # text_normalized2 = F.normalize(text_embeddings2, dim=2, p=2)
-        # score_map2 = torch.einsum('bchw,bkc->bkhw', feature_map2, text_normalized2)
-        # inp_dec_level2 = torch.cat([inp_dec_level2, out_enc_level2, score_map2], dim=1)
-        ##########################################################################
-
         inp_dec_level2 = self.reduce_chan_level2(inp_dec_level2)
         out_dec_level2 = self.decoder_level2(inp_dec_level2)
 
@@ -208,33 +111,12 @@ class Text_IF(nn.Module):
          
         inp_dec_level1 = self.prompt_guidance_1(inp_dec_level1, text_features)
         out_enc_level1 = self.feature_fusion_1(out_enc_level1_A, out_enc_level1_B)
-        ##########################################################################
-        # # For DenseCLIP loss
-        # global_feat1, feature_map1 = self.attention_pool1(out_enc_level1) # global_feat: [8, 48] = (b,c), feature_map: [8, 48, 96, 96] = (b,c,h,w)
-        # global_feat1 = global_feat1.unsqueeze(-1).unsqueeze(-1)
-        # inp_dec_level1, text_diff1 = self.prompt_guidance_1(inp_dec_level1 + global_feat1, text_features) # denseclip v3.1 out: [8, 48, 96, 96]
-        # text1 = self.text_chan_reduction1(text_features) # [8, 512] -> [8, 48]
-
-        # B1, C1, H1, W1 = feature_map1.shape
-        # text1 = text1.unsqueeze(1).expand(-1, 3, -1)  # B,C -> (B, 1, C) -> (B, 3, C) # not sure if necessary
-        # # also do it in the context decoder so can do it together
-        # text_embeddings1 = text1 + self.gamma * text_diff1 # should i use this somewhere else too or just here?
-        # B1, K1, C1 = text_embeddings1.shape
-
-        # feature_map1 = F.normalize(feature_map1, dim=1, p=2)
-        # text_normalized1 = F.normalize(text_embeddings1, dim=2, p=2)
-        # score_map1 = torch.einsum('bchw,bkc->bkhw', feature_map1, text_normalized1)
-        # inp_dec_level1 = torch.cat([inp_dec_level1, out_enc_level1, score_map1], dim=1) # if comment this dont forget uncomment the cat later on
-        # # sth here takes very long for val images
-        ###########################################################
-       
         inp_dec_level1 = torch.cat([inp_dec_level1, out_enc_level1], 1) 
         out_dec_level1 = self.decoder_level1(inp_dec_level1) 
         # out_dec_level1 = self.refinement(out_dec_level1)
         out_dec_level1 = self.refunet(out_dec_level1, text_features)
         out_dec = self.output(out_dec_level1)        
-        return out_dec, text_features #, score_map1, score_map2, score_map3, score_map4
-        
+        return out_dec, text_features        
 
     @torch.no_grad()
     def  get_text_feature(self, text):

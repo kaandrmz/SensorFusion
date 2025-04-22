@@ -185,12 +185,10 @@ class fusion_prompt_loss(nn.Module):
             # else:
             #     raise ValueError(f"Unknown task type: {task_type}")
             
-            # # comment above for weight embeddings
             #####################################
-            # weight embeddings
+            # comment these out if use the original loss
             task_base_weights = self.base_weights.get(task_type, self.base_weights["default"])
             if text_features is not None:
-                # print('working')
                 txt_feat = text_features[idx].unsqueeze(0)
                 
                 # Predict adjustments from text features (range [-1, 1])
@@ -281,7 +279,6 @@ class L_Intensity(nn.Module):
         Loss_intensity = F.l1_loss(fused_image, image_fused)
         return Loss_intensity
 
-# Use it only if you have a consistent modal preference
 class L_Intensity_Consist(nn.Module):
     def __init__(self):
         super(L_Intensity_Consist, self).__init__()
