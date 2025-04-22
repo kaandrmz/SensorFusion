@@ -9,7 +9,6 @@ import torch.optim.lr_scheduler as lr_scheduler
 from torch.utils.tensorboard import SummaryWriter
 import clip
 from data.prompt_dataset import PromptDataSet
-from data.simple_dataset import SimpleDataSet
 
 from model.Text_IF_model import Text_IF as create_model
 from scripts.utils import read_data, train_one_epoch, evaluate, create_lr_scheduler
@@ -311,15 +310,15 @@ if __name__ == '__main__':
     parser.add_argument('--lr', type=float, default=0.0001)
 
     # EMS
-    parser.add_argument('--low_light_path', type=str, default="SensorFusion/dataset/EMS_dataset/vis_Low_Light")
-    parser.add_argument('--over_exposure_path', type=str, default="SensorFusion/dataset/EMS_dataset/vis_Exposure")
-    parser.add_argument('--ir_low_contrast_path', type=str, default="SensorFusion/dataset/EMS_dataset/IR_Low_contrast")
-    parser.add_argument('--ir_noise_path', type=str, default="SensorFusion/dataset/EMS_dataset/IR_Random_noise")
-    parser.add_argument('--ir_stripe_noise_path', type=str, default="SensorFusion/dataset/EMS_dataset/IR_Stripe_noise")
-    parser.add_argument('--vis_blur_path', type=str, default="SensorFusion/dataset/EMS_dataset/vis_Blur")
-    parser.add_argument('--vis_haze_path', type=str, default="SensorFusion/dataset/EMS_dataset/vis_Haze")
-    parser.add_argument('--vis_rain_path', type=str, default="SensorFusion/dataset/EMS_dataset/vis_Rain")
-    parser.add_argument('--vis_random_noise_path', type=str, default="SensorFusion/dataset/EMS_dataset/vis_Random_noise")
+    parser.add_argument('--low_light_path', type=str, default="SensorFusion/dataset/EMS_dataset_extended/vis_Low_Light")
+    parser.add_argument('--over_exposure_path', type=str, default="SensorFusion/dataset/EMS_dataset_extended/vis_Exposure")
+    parser.add_argument('--ir_low_contrast_path', type=str, default="SensorFusion/dataset/EMS_dataset_extended/IR_Low_contrast")
+    parser.add_argument('--ir_noise_path', type=str, default="SensorFusion/dataset/EMS_dataset_extended/IR_Random_noise")
+    parser.add_argument('--ir_stripe_noise_path', type=str, default="SensorFusion/dataset/EMS_dataset_extended/IR_Stripe_noise")
+    parser.add_argument('--vis_blur_path', type=str, default="SensorFusion/dataset/EMS_dataset_extended/vis_Blur")
+    parser.add_argument('--vis_haze_path', type=str, default="SensorFusion/dataset/EMS_dataset_extended/vis_Haze")
+    parser.add_argument('--vis_rain_path', type=str, default="SensorFusion/dataset/EMS_dataset_extended/vis_Rain")
+    parser.add_argument('--vis_random_noise_path', type=str, default="SensorFusion/dataset/EMS_dataset_extended/vis_Random_noise")
 
     # # MSRS
     # parser.add_argument('--low_light_path', type=str, default="./SensorFusion/dataset/MSRS")

@@ -13,47 +13,47 @@ import cv2
 
 from scripts.losses import fusion_prompt_loss
 
-low_light_prompt_path = "SensorFusion/dataset/EMS_dataset/vis_Low_Light/train/text.txt"
+low_light_prompt_path = "SensorFusion/dataset/EMS_dataset_extended/vis_Low_Light/train/text.txt"
 assert os.path.exists(low_light_prompt_path), "text prompt root: {} does not exist.".format(low_light_prompt_path)
 with open(low_light_prompt_path, 'r', encoding='utf-8') as file:
     low_light_lines = file.readlines()
 
-over_exposure_prompt_path = "SensorFusion/dataset/EMS_dataset/vis_Exposure/train/text.txt"
+over_exposure_prompt_path = "SensorFusion/dataset/EMS_dataset_extended/vis_Exposure/train/text.txt"
 assert os.path.exists(over_exposure_prompt_path), "text prompt root: {} does not exist.".format(over_exposure_prompt_path)
 with open(over_exposure_prompt_path, 'r', encoding='utf-8') as file:
     over_exposure_lines = file.readlines()
 
-ir_low_contrast_prompt_path = "SensorFusion/dataset/EMS_dataset/IR_Low_contrast/train/text.txt"
+ir_low_contrast_prompt_path = "SensorFusion/dataset/EMS_dataset_extended/IR_Low_contrast/train/text.txt"
 assert os.path.exists(ir_low_contrast_prompt_path), "text prompt root: {} does not exist.".format(ir_low_contrast_prompt_path)
 with open(ir_low_contrast_prompt_path, 'r', encoding='utf-8') as file:
     ir_low_contrast_lines = file.readlines()
 
-ir_noise_prompt_path = "SensorFusion/dataset/EMS_dataset/IR_Random_noise/train/text.txt"
+ir_noise_prompt_path = "SensorFusion/dataset/EMS_dataset_extended/IR_Random_noise/train/text.txt"
 assert os.path.exists(ir_noise_prompt_path), "text prompt root: {} does not exist.".format(ir_noise_prompt_path)
 with open(ir_noise_prompt_path, 'r', encoding='utf-8') as file:
     ir_noise_lines = file.readlines()
 
-ir_stripe_noise_prompt_path = "SensorFusion/dataset/EMS_dataset/IR_Stripe_noise/train/text.txt"
+ir_stripe_noise_prompt_path = "SensorFusion/dataset/EMS_dataset_extended/IR_Stripe_noise/train/text.txt"
 assert os.path.exists(ir_stripe_noise_prompt_path), "text prompt root: {} does not exist.".format(ir_stripe_noise_prompt_path)
 with open(ir_stripe_noise_prompt_path, 'r', encoding='utf-8') as file:
     ir_stripe_noise_lines = file.readlines()
 
-vis_blur_prompt_path = "SensorFusion/dataset/EMS_dataset/vis_Blur/train/text.txt"
+vis_blur_prompt_path = "SensorFusion/dataset/EMS_dataset_extended/vis_Blur/train/text.txt"
 assert os.path.exists(vis_blur_prompt_path), "text prompt root: {} does not exist.".format(vis_blur_prompt_path)
 with open(vis_blur_prompt_path, 'r', encoding='utf-8') as file:
     vis_blur_lines = file.readlines()
 
-vis_haze_prompt_path = "SensorFusion/dataset/EMS_dataset/vis_Haze/train/text.txt"
+vis_haze_prompt_path = "SensorFusion/dataset/EMS_dataset_extended/vis_Haze/train/text.txt"
 assert os.path.exists(vis_haze_prompt_path), "text prompt root: {} does not exist.".format(vis_haze_prompt_path)
 with open(vis_haze_prompt_path, 'r', encoding='utf-8') as file:
     vis_haze_lines = file.readlines()
 
-vis_rain_prompt_path = "SensorFusion/dataset/EMS_dataset/vis_Rain/train/text.txt"
+vis_rain_prompt_path = "SensorFusion/dataset/EMS_dataset_extended/vis_Rain/train/text.txt"
 assert os.path.exists(vis_rain_prompt_path), "text prompt root: {} does not exist.".format(vis_rain_prompt_path)
 with open(vis_rain_prompt_path, 'r', encoding='utf-8') as file:
     vis_rain_lines = file.readlines()
 
-vis_random_noise_prompt_path = "SensorFusion/dataset/EMS_dataset/vis_Random_noise/train/text.txt"
+vis_random_noise_prompt_path = "SensorFusion/dataset/EMS_dataset_extended/vis_Random_noise/train/text.txt"
 assert os.path.exists(vis_random_noise_prompt_path), "text prompt root: {} does not exist.".format(vis_random_noise_prompt_path)
 with open(vis_random_noise_prompt_path, 'r', encoding='utf-8') as file:
     vis_random_noise_lines = file.readlines()
@@ -222,10 +222,7 @@ def train_one_epoch(model, model_clip, optimizer, lr_scheduler, data_loader, dev
             I_B_gt = I_B_gt.to(device)
 
         
-        # I_fused = model(I_A, I_B, text) # For original
         I_fused, text_features = model(I_A, I_B, text)
-
-        # loss, loss_ssim, loss_max, loss_color, loss_text = loss_function_prompt(I_A_gt, I_B_gt, I_fused, task) # original	
         loss, loss_ssim, loss_max, loss_color, loss_text = loss_function_prompt(I_A_gt, I_B_gt, I_fused, task, text_features) 
         loss.backward()
 
@@ -310,11 +307,8 @@ def evaluate(model, data_loader, device, epoch, lr, filefold_path):
             I_B_gt = I_B_gt.to(device)
             I_full = I_full.to(device)
 
-        # I_fused = model(I_A, I_B, text) # for original
         I_fused, text_features = model(I_A, I_B, text)
-
-
-
+        
         if epoch % save_epoch == 0:
             if cnt <= save_length:
                 fused_img_Y = tensor2numpy(I_fused)
@@ -326,15 +320,12 @@ def evaluate(model, data_loader, device, epoch, lr, filefold_path):
                     save_pic(img_ir, evalfold_path, str(name[0]) + "ir")
                 cnt += 1
 
-        # loss, loss_ssim, loss_max, loss_color, loss_text = loss_function_prompt(I_A_gt, I_B_gt, I_fused, task) # original
         loss, loss_ssim, loss_max, loss_color, loss_text = loss_function_prompt(I_A_gt, I_B_gt, I_fused, task, text_features)        
-        
-        accu_total_loss += loss
-
+        accu_total_loss += loss.detach()
         accu_ssim_loss += loss_ssim.detach()
         accu_max_loss += loss_max.detach()
         accu_color_loss += loss_color.detach()
-        accu_text_loss += loss_text
+        accu_text_loss += loss_text.detach()
 
         data_loader.desc = "[val epoch {}] loss: {:.3f} ssim loss: {:.3f}  max loss: {:.3f}  color loss: {:.3f}  text loss: {:.3f}  lr: {:.6f}".format(epoch, accu_total_loss.item() / (step + 1), accu_ssim_loss.item() / (step + 1), accu_max_loss.item() / (step + 1), accu_color_loss.item() / (step + 1), accu_text_loss.item() / (step + 1), lr)
         

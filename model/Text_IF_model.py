@@ -29,44 +29,39 @@ class Text_IF(nn.Module):
 
         self.cross_attention = Cross_attention(dim * 2 ** 3)
         self.attention_spatial = Attention_spatial(dim * 2 ** 3)
-
         self.feature_fusion_4 = Fusion_Embed(embed_dim=dim * 2 ** 3)
-
-        # self.prompt_guidance_4 = FeatureWiseAffine(in_channels=512, out_channels=dim * 2 ** 3) # original
+        # changed this from FeaturesWiseAffine to ContextDecoder
         self.prompt_guidance_4 = ContextDecoder(visual_dim=dim * 2**3,transformer_width=512)
-        
         self.decoder_level4 = nn.Sequential(*[
             TransformerBlock(dim=int(dim * 2 ** 3), num_heads=heads[3], ffn_expansion_factor=ffn_expansion_factor,
                              bias=bias, LayerNorm_type=LayerNorm_type) for i in range(num_blocks[3])])
 
         self.feature_fusion_3 = Fusion_Embed(embed_dim = dim * 2 ** 2)
-
-        # self.prompt_guidance_3 = FeatureWiseAffine(in_channels=512, out_channels=dim * 2 ** 2) # original
+        # changed this from FeaturesWiseAffine to ContextDecoder
         self.prompt_guidance_3 = ContextDecoder(visual_dim=dim * 2 ** 2, transformer_width=512)
-
-
+        
         self.up4_3 = Upsample(int(dim * 2 ** 3))  ## From Level 4 to Level 3
+        
         self.reduce_chan_level3 = nn.Conv2d(int(dim * 2 ** 3), int(dim * 2 ** 2), kernel_size=1, bias=bias) 
         self.decoder_level3 = nn.Sequential(*[
             TransformerBlock(dim=int(dim * 2 ** 2), num_heads=heads[2], ffn_expansion_factor=ffn_expansion_factor,
                              bias=bias, LayerNorm_type=LayerNorm_type) for i in range(num_blocks[2])])
         self.feature_fusion_2 = Fusion_Embed(embed_dim = dim * 2 ** 1)
-        # self.prompt_guidance_2 = FeatureWiseAffine(in_channels=512, out_channels=dim * 2 ** 1) # original
+        # changed this from FeaturesWiseAffine to ContextDecoder
         self.prompt_guidance_2 = ContextDecoder(visual_dim=dim * 2 ** 1, transformer_width=512)
 
-
-
         self.up3_2 = Upsample(int(dim * 2 ** 2))  ## From Level 3 to Level 2
+        
         self.reduce_chan_level2 = nn.Conv2d(int(dim * 2 ** 2), int(dim * 2 ** 1), kernel_size=1, bias=bias)
         self.decoder_level2 = nn.Sequential(*[
             TransformerBlock(dim=int(dim * 2 ** 1), num_heads=heads[1], ffn_expansion_factor=ffn_expansion_factor,
                              bias=bias, LayerNorm_type=LayerNorm_type) for i in range(num_blocks[1])])
-        self.feature_fusion_1 = Fusion_Embed(embed_dim = dim)
-        # self.prompt_guidance_1 = FeatureWiseAffine(in_channels=512, out_channels=dim) # original
-        self.prompt_guidance_1 = ContextDecoder(visual_dim=dim, transformer_width=512)
-
+        
         self.up2_1 = Upsample(int(dim * 2 ** 1))  ## From Level 2 to Level 1
-        # here no 1x1 conv to reduce channels
+        
+        self.feature_fusion_1 = Fusion_Embed(embed_dim = dim)
+        # changed this from FeaturesWiseAffine to ContextDecoder
+        self.prompt_guidance_1 = ContextDecoder(visual_dim=dim, transformer_width=512)
         self.decoder_level1 = nn.Sequential(*[ 
             TransformerBlock(dim=int(dim * 2 ** 1), num_heads=heads[0], ffn_expansion_factor=ffn_expansion_factor,
                              bias=bias, LayerNorm_type=LayerNorm_type) for i in range(num_blocks[0])])
@@ -113,7 +108,6 @@ class Text_IF(nn.Module):
         out_enc_level1 = self.feature_fusion_1(out_enc_level1_A, out_enc_level1_B)
         inp_dec_level1 = torch.cat([inp_dec_level1, out_enc_level1], 1) 
         out_dec_level1 = self.decoder_level1(inp_dec_level1) 
-        # out_dec_level1 = self.refinement(out_dec_level1)
         out_dec_level1 = self.refunet(out_dec_level1, text_features)
         out_dec = self.output(out_dec_level1)        
         return out_dec, text_features        

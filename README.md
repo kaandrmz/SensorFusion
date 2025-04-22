@@ -42,7 +42,7 @@ python3 SensorFusion/train_fusion.py
 
 ## 6. References
 
-This model is based on the work of Yi et al.: 
+The code of this model is based on the work of Yi et al.: 
 ```
 @inproceedings{yi2024text,
   title={Text-IF: Leveraging Semantic Text Guidance for Degradation-Aware and Interactive Image Fusion},

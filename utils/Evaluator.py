@@ -20,7 +20,7 @@ except ImportError:
 try:
     import pyiqa
 except ImportError:
-    raise ImportError("Please install pyiqa +to use MUSIQ")
+    raise ImportError("Please install pyiqa")
 
 def image_read_cv2(path, mode='RGB'):
     img_BGR = cv2.imread(path).astype('float32')

@@ -31,115 +31,114 @@ class fusion_loss(nn.Module):
         return image_gray
 
 class fusion_prompt_loss(nn.Module):
-    def __init__(self,window_size=48,text_dim=512):
+    def __init__(self,window_size=48, text_dim=512, use_dynamic_weights=True):
         super(fusion_prompt_loss, self).__init__()
         self.fusion_loss = fusion_loss(window_size=window_size)
-        #####################################################
-        self.base_weights = {
-            "low_light": {
-                "max": 8.0, 
-                "ssim_vis": 1.0, 
-                "ssim_ir": 1.0, 
-                "ssim": 1.0, 
-                "color": 12.0, 
-                "text": 10.0
-            },
-            "over_exposure": {
-                "max": 4.0, 
-                "ssim_vis": 1.0, 
-                "ssim_ir": 1.0, 
-                "ssim": 0.0, 
-                "color": 12.0, 
-                "text": 2.0
-            },
-            "ir_low_contrast": {
-                "max": 8.0, 
-                "ssim_vis": 1.0, 
-                "ssim_ir": 1.0, 
-                "ssim": 1.0, 
-                "color": 12.0, 
-                "text": 10.0
-            },
-            "ir_noise": {
-                "max": 6.0, 
-                "ssim_vis": 1.0, 
-                "ssim_ir": 1.0, 
-                "ssim": 1.0, 
-                "color": 12.0, 
-                "text": 10.0
-            },
-            "ir_stripe_noise": {
-                "max": 6.0, 
-                "ssim_vis": 1.0, 
-                "ssim_ir": 1.0, 
-                "ssim": 1.0, 
-                "color": 12.0, 
-                "text": 10.0
-            },
-            "vis_blur": {
-                "max": 5.0, 
-                "ssim_vis": 1.0, 
-                "ssim_ir": 1.0, 
-                "ssim": 1.0, 
-                "color": 12.0, 
-                "text": 8.0
-            },
-            "vis_haze": {
-                "max": 5.0, 
-                "ssim_vis": 1.0, 
-                "ssim_ir": 1.0, 
-                "ssim": 1.0, 
-                "color": 12.0, 
-                "text": 8.0
-            },
-            "vis_rain": {
-                "max": 5.0, 
-                "ssim_vis": 1.0, 
-                "ssim_ir": 1.0, 
-                "ssim": 1.0, 
-                "color": 12.0, 
-                "text": 8.0
-            },
-            "vis_random_noise": {
-                "max": 5.0, 
-                "ssim_vis": 1.0, 
-                "ssim_ir": 1.0, 
-                "ssim": 1.0, 
-                "color": 12.0, 
-                "text": 8.0
-            },
-            "default": {
-                "max": 5.0, 
-                "ssim_vis": 1.0, 
-                "ssim_ir": 1.0, 
-                "ssim": 1.0, 
-                "color": 12.0, 
-                "text": 8.0
+        self.use_dynamic_weights=use_dynamic_weights
+        if use_dynamic_weights:
+            self.base_weights = {
+                "low_light": {
+                    "max": 8.0, 
+                    "ssim_vis": 1.0, 
+                    "ssim_ir": 1.0, 
+                    "ssim": 1.0, 
+                    "color": 12.0, 
+                    "text": 10.0
+                },
+                "over_exposure": {
+                    "max": 4.0, 
+                    "ssim_vis": 1.0, 
+                    "ssim_ir": 1.0, 
+                    "ssim": 0.0, 
+                    "color": 12.0, 
+                    "text": 2.0
+                },
+                "ir_low_contrast": {
+                    "max": 8.0, 
+                    "ssim_vis": 1.0, 
+                    "ssim_ir": 1.0, 
+                    "ssim": 1.0, 
+                    "color": 12.0, 
+                    "text": 10.0
+                },
+                "ir_noise": {
+                    "max": 6.0, 
+                    "ssim_vis": 1.0, 
+                    "ssim_ir": 1.0, 
+                    "ssim": 1.0, 
+                    "color": 12.0, 
+                    "text": 10.0
+                },
+                "ir_stripe_noise": {
+                    "max": 6.0, 
+                    "ssim_vis": 1.0, 
+                    "ssim_ir": 1.0, 
+                    "ssim": 1.0, 
+                    "color": 12.0, 
+                    "text": 10.0
+                },
+                "vis_blur": {
+                    "max": 5.0, 
+                    "ssim_vis": 1.0, 
+                    "ssim_ir": 1.0, 
+                    "ssim": 1.0, 
+                    "color": 12.0, 
+                    "text": 8.0
+                },
+                "vis_haze": {
+                    "max": 5.0, 
+                    "ssim_vis": 1.0, 
+                    "ssim_ir": 1.0, 
+                    "ssim": 1.0, 
+                    "color": 12.0, 
+                    "text": 8.0
+                },
+                "vis_rain": {
+                    "max": 5.0, 
+                    "ssim_vis": 1.0, 
+                    "ssim_ir": 1.0, 
+                    "ssim": 1.0, 
+                    "color": 12.0, 
+                    "text": 8.0
+                },
+                "vis_random_noise": {
+                    "max": 5.0, 
+                    "ssim_vis": 1.0, 
+                    "ssim_ir": 1.0, 
+                    "ssim": 1.0, 
+                    "color": 12.0, 
+                    "text": 8.0
+                },
+                "default": {
+                    "max": 5.0, 
+                    "ssim_vis": 1.0, 
+                    "ssim_ir": 1.0, 
+                    "ssim": 1.0, 
+                    "color": 12.0, 
+                    "text": 8.0
+                }
             }
-        }
-        
-        # Network to predict weight adjustments from text embeddings
-        self.adjustment_predictor = nn.Sequential(
-            nn.Linear(text_dim, 128),
-            nn.ReLU(inplace=True),
-            nn.Dropout(0.1),
-            nn.Linear(128, 64),
-            nn.ReLU(inplace=True),
-            nn.Linear(64, 6),  # Predict 6 adjustments for all loss parameters
-            nn.Tanh()  # Output range [-1, 1] for adjustments
-        )
-        
-        # Adjustment scale factors for all 6 parameters
-        self.adjustment_scales = {
-            "max": 3.0,       # Allow max_ratio to be adjusted by ±3
-            "ssim_vis": 0.5,  # Allow ssim_vis_ratio to be adjusted by ±0.5
-            "ssim_ir": 0.5,   # Allow ssim_ir_ratio to be adjusted by ±0.5
-            "ssim": 1.0,      # Allow ssim_ratio to be adjusted by ±1
-            "color": 4.0,     # Allow color_ratio to be adjusted by ±4
-            "text": 4.0       # Allow text_ratio to be adjusted by ±4
-        }
-        #####################################################
-
+            
+            # Network to predict weight adjustments from text embeddings
+            self.adjustment_predictor = nn.Sequential(
+                nn.Linear(text_dim, 128),
+                nn.ReLU(inplace=True),
+                nn.Dropout(0.1),
+                nn.Linear(128, 64),
+                nn.ReLU(inplace=True),
+                nn.Linear(64, 6),  # Predict 6 adjustments for all loss parameters
+                nn.Tanh()  # Output range [-1, 1] for adjustments
+            )
+            
+            # Adjustment scale factors for all 6 parameters
+            self.adjustment_scales = {
+                "max": 3.0,       # Allow max_ratio to be adjusted by ±3
+                "ssim_vis": 0.5,  # Allow ssim_vis_ratio to be adjusted by ±0.5
+                "ssim_ir": 0.5,   # Allow ssim_ir_ratio to be adjusted by ±0.5
+                "ssim": 1.0,      # Allow ssim_ratio to be adjusted by ±1
+                "color": 4.0,     # Allow color_ratio to be adjusted by ±4
+                "text": 4.0       # Allow text_ratio to be adjusted by ±4
+            }
 
     def forward(self, image_A, image_B, image_fused, task, text_features=None):
         total_loss = 0
@@ -154,73 +153,76 @@ class fusion_prompt_loss(nn.Module):
             img_A = self._get_image(image_A, idx)
             img_B = self._get_image(image_B, idx)
             img_fused = self._get_image(image_fused, idx)
-
-            # if task_type == "low_light":
-            #     loss, ssim_loss, max_loss, color_loss, grad_loss = self.fusion_loss(img_A, img_B, img_fused,
-            #                                                                         max_ratio=8, ssim_ratio=1, text_ratio=10)
-            # elif task_type == "over_exposure":
-            #     loss, ssim_loss, max_loss, color_loss, grad_loss = self.fusion_loss(img_A, img_B, img_fused,
-            #                                                                         max_ratio=4, ssim_ratio=0, text_ratio=2)
-            # elif task_type == "ir_low_contrast":
-            #     loss, ssim_loss, max_loss, color_loss, grad_loss = self.fusion_loss(img_A, img_B, img_fused,
-            #                                                                         max_ratio=8, ssim_ratio=1, text_ratio=10)
-            # elif task_type == "ir_noise":
-            #     loss, ssim_loss, max_loss, color_loss, grad_loss = self.fusion_loss(img_A, img_B, img_fused,
-            #                                                                         max_ratio=6, ssim_ratio=1, text_ratio=10)
-            # elif task_type == "ir_stripe_noise":
-            #     loss, ssim_loss, max_loss, color_loss, grad_loss = self.fusion_loss(img_A, img_B, img_fused,
-            #                                                                         max_ratio=6, ssim_ratio=1, text_ratio=10)
-            # elif task_type == "vis_blur":
-            #     loss, ssim_loss, max_loss, color_loss, grad_loss = self.fusion_loss(img_A, img_B, img_fused,
-            #                                                                         max_ratio=5, ssim_ratio=1, text_ratio=8)
-            # elif task_type == "vis_haze":
-            #     loss, ssim_loss, max_loss, color_loss, grad_loss = self.fusion_loss(img_A, img_B, img_fused,
-            #                                                                         max_ratio=5, ssim_ratio=1, text_ratio=8)
-            # elif task_type == "vis_rain":
-            #     loss, ssim_loss, max_loss, color_loss, grad_loss = self.fusion_loss(img_A, img_B, img_fused,
-            #                                                                         max_ratio=5, ssim_ratio=1, text_ratio=8)
-            # elif task_type == "vis_random_noise":
-            #     loss, ssim_loss, max_loss, color_loss, grad_loss = self.fusion_loss(img_A, img_B, img_fused,
-            #                                                                         max_ratio=5, ssim_ratio=1, text_ratio=8)
-            # else:
-            #     raise ValueError(f"Unknown task type: {task_type}")
-            
-            #####################################
-            # comment these out if use the original loss
-            task_base_weights = self.base_weights.get(task_type, self.base_weights["default"])
-            if text_features is not None:
-                txt_feat = text_features[idx].unsqueeze(0)
+             
+            # our model
+            if self.use_dynamic_weights:                
+                task_base_weights = self.base_weights.get(task_type, self.base_weights["default"])
+                if text_features is not None:
+                    txt_feat = text_features[idx].unsqueeze(0)
+                    
+                    # Predict adjustments from text features (range [-1, 1])
+                    adjustments = self.adjustment_predictor(txt_feat)
+                    
+                    # Apply adjustments to all 6 base weights
+                    max_ratio = task_base_weights["max"] + (adjustments[0, 0] * self.adjustment_scales["max"])
+                    ssim_vis_ratio = task_base_weights["ssim_vis"] + (adjustments[0, 1] * self.adjustment_scales["ssim_vis"])
+                    ssim_ir_ratio = task_base_weights["ssim_ir"] + (adjustments[0, 2] * self.adjustment_scales["ssim_ir"])
+                    ssim_ratio = task_base_weights["ssim"] + (adjustments[0, 3] * self.adjustment_scales["ssim"])
+                    color_ratio = task_base_weights["color"] + (adjustments[0, 4] * self.adjustment_scales["color"])
+                    text_ratio = task_base_weights["text"] + (adjustments[0, 5] * self.adjustment_scales["text"])
+                    
+                    # Ensure weights are non-negative
+                    max_ratio = torch.relu(max_ratio)
+                    ssim_vis_ratio = torch.relu(ssim_vis_ratio)
+                    ssim_ir_ratio = torch.relu(ssim_ir_ratio)
+                    ssim_ratio = torch.relu(ssim_ratio)
+                    color_ratio = torch.relu(color_ratio)
+                    text_ratio = torch.relu(text_ratio)
+                                
+                # Pass all dynamic weights to the fusion loss
+                loss, ssim_loss, max_loss, color_loss, grad_loss = self.fusion_loss(
+                    img_A, img_B, img_fused,
+                    max_ratio=max_ratio, 
+                    ssim_vis_ratio=ssim_vis_ratio,
+                    ssim_ir_ratio=ssim_ir_ratio,
+                    ssim_ratio=ssim_ratio, 
+                    color_ratio=color_ratio, 
+                    text_ratio=text_ratio
+                )
                 
-                # Predict adjustments from text features (range [-1, 1])
-                adjustments = self.adjustment_predictor(txt_feat)
+            # this was in original Text-IF
+            else:
+                if task_type == "low_light":
+                    loss, ssim_loss, max_loss, color_loss, grad_loss = self.fusion_loss(img_A, img_B, img_fused,
+                                                                                        max_ratio=8, ssim_ratio=1, text_ratio=10)
+                elif task_type == "over_exposure":
+                    loss, ssim_loss, max_loss, color_loss, grad_loss = self.fusion_loss(img_A, img_B, img_fused,
+                                                                                        max_ratio=4, ssim_ratio=0, text_ratio=2)
+                elif task_type == "ir_low_contrast":
+                    loss, ssim_loss, max_loss, color_loss, grad_loss = self.fusion_loss(img_A, img_B, img_fused,
+                                                                                        max_ratio=8, ssim_ratio=1, text_ratio=10)
+                elif task_type == "ir_noise":
+                    loss, ssim_loss, max_loss, color_loss, grad_loss = self.fusion_loss(img_A, img_B, img_fused,
+                                                                                        max_ratio=6, ssim_ratio=1, text_ratio=10)
+                elif task_type == "ir_stripe_noise":
+                    loss, ssim_loss, max_loss, color_loss, grad_loss = self.fusion_loss(img_A, img_B, img_fused,
+                                                                                        max_ratio=6, ssim_ratio=1, text_ratio=10)
+                elif task_type == "vis_blur":
+                    loss, ssim_loss, max_loss, color_loss, grad_loss = self.fusion_loss(img_A, img_B, img_fused,
+                                                                                        max_ratio=5, ssim_ratio=1, text_ratio=8)
+                elif task_type == "vis_haze":
+                    loss, ssim_loss, max_loss, color_loss, grad_loss = self.fusion_loss(img_A, img_B, img_fused,
+                                                                                        max_ratio=5, ssim_ratio=1, text_ratio=8)
+                elif task_type == "vis_rain":
+                    loss, ssim_loss, max_loss, color_loss, grad_loss = self.fusion_loss(img_A, img_B, img_fused,
+                                                                                        max_ratio=5, ssim_ratio=1, text_ratio=8)
+                elif task_type == "vis_random_noise":
+                    loss, ssim_loss, max_loss, color_loss, grad_loss = self.fusion_loss(img_A, img_B, img_fused,
+                                                                                        max_ratio=5, ssim_ratio=1, text_ratio=8)
+                else:
+                    raise ValueError(f"Unknown task type: {task_type}")
                 
-                # Apply adjustments to all 6 base weights
-                max_ratio = task_base_weights["max"] + (adjustments[0, 0] * self.adjustment_scales["max"])
-                ssim_vis_ratio = task_base_weights["ssim_vis"] + (adjustments[0, 1] * self.adjustment_scales["ssim_vis"])
-                ssim_ir_ratio = task_base_weights["ssim_ir"] + (adjustments[0, 2] * self.adjustment_scales["ssim_ir"])
-                ssim_ratio = task_base_weights["ssim"] + (adjustments[0, 3] * self.adjustment_scales["ssim"])
-                color_ratio = task_base_weights["color"] + (adjustments[0, 4] * self.adjustment_scales["color"])
-                text_ratio = task_base_weights["text"] + (adjustments[0, 5] * self.adjustment_scales["text"])
                 
-                # Ensure weights are non-negative
-                max_ratio = torch.relu(max_ratio)
-                ssim_vis_ratio = torch.relu(ssim_vis_ratio)
-                ssim_ir_ratio = torch.relu(ssim_ir_ratio)
-                ssim_ratio = torch.relu(ssim_ratio)
-                color_ratio = torch.relu(color_ratio)
-                text_ratio = torch.relu(text_ratio)
-                            
-            # Pass all dynamic weights to the fusion loss
-            loss, ssim_loss, max_loss, color_loss, grad_loss = self.fusion_loss(
-                img_A, img_B, img_fused,
-                max_ratio=max_ratio, 
-                ssim_vis_ratio=ssim_vis_ratio,
-                ssim_ir_ratio=ssim_ir_ratio,
-                ssim_ratio=ssim_ratio, 
-                color_ratio=color_ratio, 
-                text_ratio=text_ratio
-            )
-            #####################################
             total_loss += loss
             total_ssim_loss += ssim_loss
             total_max_loss += max_loss
