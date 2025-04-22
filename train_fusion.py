@@ -320,41 +320,6 @@ if __name__ == '__main__':
     parser.add_argument('--vis_rain_path', type=str, default="SensorFusion/dataset/EMS_dataset_extended/vis_Rain")
     parser.add_argument('--vis_random_noise_path', type=str, default="SensorFusion/dataset/EMS_dataset_extended/vis_Random_noise")
 
-    # # MSRS
-    # parser.add_argument('--low_light_path', type=str, default="./SensorFusion/dataset/MSRS")
-    # parser.add_argument('--over_exposure_path', type=str, default=None)
-    # parser.add_argument('--ir_low_contrast_path', type=str, default=None)
-    # parser.add_argument('--ir_noise_path', type=str, default=None)
-    # parser.add_argument('--ir_stripe_noise_path', type=str, default=None)
-    # parser.add_argument('--vis_blur_path', type=str, default=None)
-    # parser.add_argument('--vis_haze_path', type=str, default=None)
-    # parser.add_argument('--vis_rain_path', type=str, default=None)
-    # parser.add_argument('--vis_random_noise_path', type=str, default=None)
-
-    # # LLVIP
-    # parser.add_argument('--low_light_path', type=str, default="./SensorFusion/dataset/LLVIP")
-    # parser.add_argument('--over_exposure_path', type=str, default=None)
-    # parser.add_argument('--ir_low_contrast_path', type=str, default=None)
-    # parser.add_argument('--ir_noise_path', type=str, default=None)
-    # parser.add_argument('--ir_stripe_noise_path', type=str, default=None)
-    # parser.add_argument('--vis_blur_path', type=str, default=None)
-    # parser.add_argument('--vis_haze_path', type=str, default=None)
-    # parser.add_argument('--vis_rain_path', type=str, default=None)
-    # parser.add_argument('--vis_random_noise_path', type=str, default=None)   
-
-    # # MFNet
-    # parser.add_argument('--low_light_path', type=str, default=None)
-    # parser.add_argument('--over_exposure_path', type=str, default=None)
-    # parser.add_argument('--ir_low_contrast_path', type=str, default="./SensorFusion/dataset/MFNET/MFNET")
-    # parser.add_argument('--ir_noise_path', type=str, default=None)
-    # parser.add_argument('--ir_stripe_noise_path', type=str, default=None)
-    # parser.add_argument('--vis_blur_path', type=str, default=None)
-    # parser.add_argument('--vis_haze_path', type=str, default=None)
-    # parser.add_argument('--vis_rain_path', type=str, default=None)
-    # parser.add_argument('--vis_random_noise_path', type=str, default=None) 
-    # 
-
-
     parser.add_argument('--weights', type=str, default='',
                         help='initial weights path')
     parser.add_argument('--val_every_epcho', type=int, default=2, help='val every epcho')
@@ -363,7 +328,7 @@ if __name__ == '__main__':
     parser.add_argument('--device', default='cuda', help='device (i.e. cuda or cpu)')
     parser.add_argument('--gpu_id', default='0', help='device id (i.e. 0, 1, 2 or 3)')
     
-    # Add sampling arguments
+    # Add sampling arguments if needed 
     parser.add_argument('--sample', action='store_true', help='whether to sample the dataset')
     parser.add_argument('--sample_ratio', type=float, default=0.4, help='ratio of data to sample (0-1)')
 
